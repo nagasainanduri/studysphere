@@ -101,7 +101,7 @@ StudySphere is a decentralized educational platform built on the Internet Comput
 
 ## License
 
-This project is licensed under the MIT License (to be added).
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 
