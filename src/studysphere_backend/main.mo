@@ -6,6 +6,7 @@ import Nat32 "mo:base/Nat32";
 import Hash "mo:base/Hash";
 import Iter "mo:base/Iter";
 import Array "mo:base/Array";
+import Time "mo:base/Time";
 import User "user/user";
 import Group "group/group";
 import NoteNFT "note/noteNFT";
@@ -15,8 +16,10 @@ import Types "types/types";
 actor StudySphere {
   // Stable arrays for persistence
   private stable var groupEntries: [(Types.GroupId, Types.Group)] = [];
+  private stable var messageEntries: [(Nat, Types.Message)] = [];
   private stable var noteEntries: [(Types.NoteId, Types.NoteNFT)] = [];
   private stable var nextGroupId: Nat = 0;
+  private stable var nextMessageId: Nat = 0;
   private stable var nextNoteId: Nat = 0;
 
   // Runtime HashMaps
@@ -25,6 +28,13 @@ actor StudySphere {
     Nat.equal,
     func(gid: Types.GroupId) : Hash.Hash {
       Nat32.fromNat(gid)
+    }
+  );
+  private var messages = HashMap.HashMap<Nat, Types.Message>(
+    10,
+    Nat.equal,
+    func(mid: Nat) : Hash.Hash {
+      Nat32.fromNat(mid)
     }
   );
   private var notes = HashMap.HashMap<Types.NoteId, Types.NoteNFT>(
@@ -44,32 +54,69 @@ actor StudySphere {
   // System methods for persistence
   system func preupgrade() {
     groupEntries := Iter.toArray(groups.entries());
+    messageEntries := Iter.toArray(messages.entries());
     noteEntries := Iter.toArray(notes.entries());
     nextGroupId := nextGroupId;
+    nextMessageId := nextMessageId;
     nextNoteId := nextNoteId;
   };
 
   system func postupgrade() {
-    groups := HashMap.fromIter<Types.GroupId, Types.Group>( groupEntries.vals(), 10, Nat.equal, func(gid: Types.GroupId) : Hash.Hash { Nat32.fromNat(gid) } );
-    notes := HashMap.fromIter<Types.NoteId, Types.NoteNFT>(noteEntries.vals(), 10, Nat.equal, func(noteId: Types.NoteId) : Hash.Hash { Nat32.fromNat(noteId) });
+    groups := HashMap.fromIter<Types.GroupId, Types.Group>(
+      groupEntries.vals(), 
+      10, 
+      Nat.equal, 
+      func(gid: Types.GroupId) : Hash.Hash { Nat32.fromNat(gid) }
+    );
+    messages := HashMap.fromIter<Nat, Types.Message>(
+      messageEntries.vals(),
+      10,
+      Nat.equal,
+      func(mid: Nat) : Hash.Hash { Nat32.fromNat(mid) }
+    );
+    notes := HashMap.fromIter<Types.NoteId, Types.NoteNFT>(
+      noteEntries.vals(), 
+      10, 
+      Nat.equal, 
+      func(noteId: Types.NoteId) : Hash.Hash { Nat32.fromNat(noteId) }
+    );
     groupEntries := [];
+    messageEntries := [];
     noteEntries := [];
 
-    let highestGroupId = Array.foldLeft<(Types.GroupId, Types.Group), Nat>(groupEntries, 0, func(acc, (gid, _)) = if (gid >= acc) gid + 1 else acc);
+    let highestGroupId = Array.foldLeft<(Types.GroupId, Types.Group), Nat>(
+      groupEntries, 
+      0, 
+      func(acc, (gid, _)) = if (gid >= acc) gid + 1 else acc
+    );
     nextGroupId := highestGroupId;
-    groupEntries := [];
 
-    let highestNoteId = Array.foldLeft<(Types.NoteId, Types.NoteNFT), Nat>(noteEntries, 0, func(acc, (nid, _)) = if (nid >= acc) nid + 1 else acc);
+    let highestMessageId = Array.foldLeft<(Nat, Types.Message), Nat>(
+      messageEntries,
+      0,
+      func(acc, (mid, _)) = if (mid >= acc) mid + 1 else acc
+    );
+    nextMessageId := highestMessageId;
+
+    let highestNoteId = Array.foldLeft<(Types.NoteId, Types.NoteNFT), Nat>(
+      noteEntries, 
+      0, 
+      func(acc, (nid, _)) = if (nid >= acc) nid + 1 else acc
+    );
     nextNoteId := highestNoteId;
   };
 
   // User Management
-  public shared(msg) func registerUser(): async Bool {
-    await userManager.registerUser(msg.caller);
+  public shared(msg) func registerUser(username: Text): async Bool {
+    await userManager.registerUser(msg.caller, username)
   };
 
   public shared(msg) func getUser(): async ?Types.User {
     await userManager.getUser(msg.caller)
+  };
+
+  public shared func getUserByUsername(username: Text): async ?Types.User {
+    await userManager.getUserByUsername(username)
   };
 
   // Group Management
@@ -86,8 +133,66 @@ actor StudySphere {
     await groupManager.joinGroup(msg.caller, groupId)
   };
 
-  public query func getGroups(): async [(Types.GroupId, Types.Group)] {
-    groupManager.getGroups()
+  public shared(msg) func sendMessage(groupId: Types.GroupId, content: Text): async Bool {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return false };
+    switch (groups.get(groupId)) {
+      case null { return false };
+      case (?group) {
+        switch (Array.find(group.members, func(m: Types.UserId): Bool { m == msg.caller })) {
+          case null { return false };
+          case (?_) {
+            let messageId = nextMessageId;
+            let message: Types.Message = {
+              id = messageId;
+              groupId = groupId;
+              content = content;
+              sender = msg.caller;
+              timestamp = Time.now();
+            };
+            messages.put(messageId, message);
+            nextMessageId += 1;
+            return true;
+          };
+        }
+      };
+    }
+  };
+
+  public shared(msg) func getMessages(groupId: Types.GroupId): async ?[Types.Message] {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return null };
+    switch (groups.get(groupId)) {
+      case null { return null };
+      case (?group) {
+        switch (Array.find(group.members, func(m: Types.UserId): Bool { m == msg.caller })) {
+          case null { return null };
+          case (?_) {
+            let groupMessages = Array.filter<Types.Message>(
+              Iter.toArray(messages.vals()),
+              func(msg: Types.Message): Bool { msg.groupId == groupId }
+            );
+            return ?groupMessages;
+          };
+        }
+      };
+    }
+  };
+
+  public query func getGroups(): async [(Types.GroupId, Types.GroupInfo)] {
+    let entries = groupManager.getGroups();
+    Array.map<(Types.GroupId, Types.Group), (Types.GroupId, Types.GroupInfo)>(
+      entries,
+      func((id, group)) {
+        (id, {
+          id = group.id;
+          name = group.name;
+          creator = group.creator;
+          members = group.members;
+          createdAt = group.createdAt;
+        })
+      }
+    )
   };
 
   // Note NFT Management

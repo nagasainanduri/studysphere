@@ -9,6 +9,9 @@ dist/
 .dfx.env
 .dfx/state/
 .vite/
+/src/declarations/
+/src/studysphere_frontend/src/declarations/
+/src/studysphere_frontend/src/studysphere_frontend 
 
 # Environment variables
 .env
@@ -20,8 +23,6 @@ dist/
 # Editor and OS files
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
 .DS_Store
 Thumbs.db
 

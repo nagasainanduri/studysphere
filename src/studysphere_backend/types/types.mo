@@ -1,7 +1,7 @@
 import Principal "mo:base/Principal";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
-import Time "mo:base/Time";
+import _HashMap "mo:base/HashMap";
 
 module {
   public type UserId = Principal;
@@ -9,15 +9,33 @@ module {
   public type NoteId = Nat;
 
   public type User = {
-    id: Principal;
+    id: UserId;
+    username : Text;
+    registeredAt: Int;
   };
 
   public type Group = {
     id: GroupId;
     name: Text;
     creator: Principal;
-    members: [Principal];
-    createdAt: Time.Time;
+    members: [UserId];
+    createdAt: Int;
+  };
+
+  public type GroupInfo = {
+    id : GroupId;
+    name : Text;
+    creator : UserId;
+    members : [UserId];
+    createdAt : Int;
+  };
+
+  public type Message = {
+    id: Nat;
+    groupId: GroupId;
+    sender: UserId;
+    content: Text;
+    timestamp: Int;
   };
 
   public type NoteNFT = {

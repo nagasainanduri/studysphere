@@ -13,8 +13,12 @@ module {
   public class GroupManager(nextGroupId: Nat, groups: HashMap.HashMap<Types.GroupId, Types.Group>) {
     private var _nextGroupId: Nat = nextGroupId;
 
+    // Create a new group
     public func createGroup(caller: Principal, name: Text, isRegistered: Bool): async ?Types.GroupId {
-      if (not isRegistered) { return null };
+      if (not isRegistered) { 
+        Debug.print("createGroup: Caller not registered");
+        return null 
+      };
       
       let groupId = _nextGroupId;
       let group: Types.Group = {
@@ -26,16 +30,17 @@ module {
       };
       groups.put(groupId, group);
       _nextGroupId += 1;
+      Debug.print("createGroup: Created group with id=" # Nat.toText(groupId));
       ?groupId
     };
 
+    // Join an existing group
     public func joinGroup(caller: Principal, groupId: Types.GroupId): async Bool {
       Debug.print("joinGroup: groupId=" # Nat.toText(groupId) # ", nextGroupId=" # Nat.toText(_nextGroupId));
       if (groupId >= _nextGroupId) {
         Debug.print("joinGroup: Invalid groupId, too large");
         return false;
       };
-      // Additional validation: Ensure groupId is reasonable
       if (groupId > 1_000_000) {
         Debug.print("joinGroup: groupId exceeds reasonable limit");
         return false;
@@ -72,6 +77,7 @@ module {
       }
     };
 
+    // Get all groups
     public func getGroups(): [(Types.GroupId, Types.Group)] {
       Iter.toArray(groups.entries())
     };
