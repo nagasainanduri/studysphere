@@ -1,7 +1,7 @@
-import { TwentyFirstToolbar } from '@21st-extension/toolbar-react';
-import { ReactPlugin } from '@21st-extension/react';
 import React, { useState, useEffect } from 'react';
 import { initAuth, login, logout } from './components/auth/auth';
+import logo from './assets/sample.png';
+import './assets/App.css';
 
 /**
  * Main application component.
@@ -37,14 +37,12 @@ const App = () => {
   };
 
   return (
-    <div style={{  position: 'relative', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',color: 'white'}}>
-      <h1 style={{ fontSize: '36px', marginBottom: '30px', fontWeight: 'bold' }}>
-        StudySphere
-      </h1>
+    <div style={{  position: 'relative', width: '50%', height: '100vh', display: 'relative', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',float: 'right',color: '#000',backgroundColor: '#fff'}}>
+      <img src={logo} alt="StudySphere Logo" style={{height: 'auto', marginTop:'32%', marginBottom: '10px', objectFit: 'contain'}}/> <br/>
       <button onClick={isAuthenticated ? handleLogout : handleLogin}
-        style={{padding: '12px 24px',backgroundColor: isAuthenticated ? '#dc3545' : '#007bff',color: 'white',border: 'none',borderRadius: '6px',cursor: isLoading ? 'not-allowed' : 'pointer',fontSize: '16px',transition: 'background-color 0.3s',opacity: isLoading ? 0.6 : 1}}
-        onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = isAuthenticated ? '#c82333' : '#0056b3')}
-        onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = isAuthenticated ? '#dc3545' : '#007bff')}
+        style={{padding: '12px 24px',backgroundColor: isAuthenticated ? '#dc3545' : '#121111',color: 'white',border: 'none',borderRadius: '6px',cursor: isLoading ? 'not-allowed' : 'pointer',fontSize: '16px',transition: 'background-color 0.3s',opacity: isLoading ? 0.6 : 1}}
+        onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = isAuthenticated ? '#c82333' : '#121225')}
+        onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = isAuthenticated ? '#dc3545' : '#121111')}
         disabled={isLoading}
       >
         {isLoading ? 'Logging in...' : isAuthenticated ? 'Logout' : 'Login with Internet Identity'}
