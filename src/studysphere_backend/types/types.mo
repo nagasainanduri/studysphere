@@ -45,5 +45,6 @@ module {
     content: Text;
     owner: Principal;
     createdAt: Int;
+    price: Nat; 
   };
 }
