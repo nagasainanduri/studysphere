@@ -13,7 +13,6 @@ module {
   public class GroupManager(nextGroupId: Nat, groups: HashMap.HashMap<Types.GroupId, Types.Group>) {
     private var _nextGroupId: Nat = nextGroupId;
 
-    // Create a new group
     public func createGroup(caller: Principal, name: Text, isRegistered: Bool): async ?Types.GroupId {
       if (not isRegistered) { 
         Debug.print("createGroup: Caller not registered");
@@ -34,7 +33,6 @@ module {
       ?groupId
     };
 
-    // Join an existing group
     public func joinGroup(caller: Principal, groupId: Types.GroupId): async Bool {
       Debug.print("joinGroup: groupId=" # Nat.toText(groupId) # ", nextGroupId=" # Nat.toText(_nextGroupId));
       if (groupId >= _nextGroupId) {
@@ -77,7 +75,70 @@ module {
       }
     };
 
-    // Get all groups
+    public func removeMember(caller: Principal, groupId: Types.GroupId, member: Principal): async Bool {
+      if (groupId >= _nextGroupId) {
+        Debug.print("removeMember: Invalid groupId");
+        return false;
+      };
+      switch (groups.get(groupId)) {
+        case null {
+          Debug.print("removeMember: Group not found");
+          return false;
+        };
+        case (?group) {
+          if (group.creator != caller) {
+            Debug.print("removeMember: Caller is not group creator");
+            return false;
+          };
+          if (member == caller) {
+            Debug.print("removeMember: Cannot remove creator");
+            return false;
+          };
+          switch (Array.find(group.members, func(m: Types.UserId): Bool { m == member })) {
+            case null {
+              Debug.print("removeMember: Member not found");
+              return false;
+            };
+            case (?_) {
+              let updatedMembers = Array.filter(group.members, func(m: Types.UserId): Bool { m != member });
+              let updatedGroup: Types.Group = {
+                id = group.id;
+                name = group.name;
+                creator = group.creator;
+                members = updatedMembers;
+                createdAt = group.createdAt;
+              };
+              groups.put(groupId, updatedGroup);
+              Debug.print("removeMember: Member removed, new member count=" # Nat.toText(updatedMembers.size()));
+              true
+            };
+          }
+        };
+      }
+    };
+
+    public func deleteGroup(caller: Principal, groupId: Types.GroupId): async Bool {
+      if (groupId >= _nextGroupId) {
+        Debug.print("deleteGroup: Invalid groupId");
+        return false;
+      };
+      switch (groups.get(groupId)) {
+        case null {
+          Debug.print("deleteGroup: Group not found");
+          return false;
+        };
+        case (?group) {
+          if (group.creator != caller) {
+            Debug.print("deleteGroup: Caller is not group creator");
+            return false;
+          };
+          groups.delete(groupId);
+          Debug.print("deleteGroup: Group deleted, id=" # Nat.toText(groupId));
+          true
+        };
+      }
+    };
+
     public func getGroups(): [(Types.GroupId, Types.Group)] {
       Iter.toArray(groups.entries())
     };
