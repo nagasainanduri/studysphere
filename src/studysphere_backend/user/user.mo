@@ -14,8 +14,8 @@ module {
         return false;
       };
       switch (users.get(caller), usernames.get(username)) {
-        case (?_, _) { false }; // User already registered
-        case (_, ?_) { false }; // Username already taken
+        case (?_, _) { false };
+        case (_, ?_) { false };
         case (null, null) {
           let user: Types.User = { 
             id = caller;
