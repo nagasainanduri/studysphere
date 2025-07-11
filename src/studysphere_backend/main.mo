@@ -133,6 +133,14 @@ actor StudySphere {
     await groupManager.joinGroup(msg.caller, groupId)
   };
 
+  public shared(msg) func removeMember(groupId: Types.GroupId, member: Principal): async Bool {
+    await groupManager.removeMember(msg.caller, groupId, member)
+  };
+
+  public shared(msg) func deleteGroup(groupId: Types.GroupId): async Bool {
+    await groupManager.deleteGroup(msg.caller, groupId)
+  };
+
   public shared(msg) func sendMessage(groupId: Types.GroupId, content: Text): async Bool {
     let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
     if (not isRegistered) { return false };
@@ -179,6 +187,25 @@ actor StudySphere {
     }
   };
 
+  public shared(msg) func deleteMessage(groupId: Types.GroupId, messageId: Nat): async Bool {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return false };
+    switch (groups.get(groupId)) {
+      case null { return false };
+      case (?group) {
+        if (group.creator != msg.caller) { return false };
+        switch (messages.get(messageId)) {
+          case null { return false };
+          case (?message) {
+            if (message.groupId != groupId) { return false };
+            messages.delete(messageId);
+            true
+          };
+        }
+      };
+    }
+  };
+
   public query func getGroups(): async [(Types.GroupId, Types.GroupInfo)] {
     let entries = groupManager.getGroups();
     Array.map<(Types.GroupId, Types.Group), (Types.GroupId, Types.GroupInfo)>(
@@ -196,13 +223,25 @@ actor StudySphere {
   };
 
   // Note NFT Management
-  public shared(msg) func mintNoteNFT(title: Text, subject: Text, content: Text): async ?Types.NoteId {
+  public shared(msg) func mintNoteNFT(title: Text, subject: Text, content: Text, price: Nat): async ?Types.NoteId {
     let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
-    let result = await noteNFTManager.mintNoteNFT(msg.caller, title, subject, content, isRegistered);
+    let result = await noteNFTManager.mintNoteNFT(msg.caller, title, subject, content, price, isRegistered);
     switch (result) {
       case (?newId) { nextNoteId := newId + 1; ?newId };
       case null { null };
     }
+  };
+
+  public shared(msg) func transferNoteNFT(noteId: Types.NoteId, to: Principal): async Bool {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return false };
+    await noteNFTManager.transferNoteNFT(msg.caller, noteId, to)
+  };
+
+  public shared(msg) func purchaseNoteNFT(noteId: Types.NoteId): async Bool {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return false };
+    await noteNFTManager.purchaseNoteNFT(msg.caller, noteId)
   };
 
   public shared query func getNoteNFT(noteId: Types.NoteId): async ?Types.NoteNFT {
@@ -218,6 +257,12 @@ actor StudySphere {
     let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
     if (not isRegistered) { return false };
     await studyTokenManager.awardTokens(msg.caller, amount)
+  };
+
+  public shared(msg) func transferTokens(to: Principal, amount: Nat): async Bool {
+    let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
+    if (not isRegistered) { return false };
+    await studyTokenManager.transferTokens(msg.caller, to, amount)
   };
 
   public shared(msg) func getTokens(): async Nat {
