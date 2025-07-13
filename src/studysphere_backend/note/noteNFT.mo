@@ -28,8 +28,8 @@ module {
 
     public func mintNoteNFT(caller: Principal, title: Text, subject: Text, content: Text, price: Nat, isRegistered: Bool): async ?Types.NoteId {
       if (not isRegistered) { return null };
-      if (title == "" or subject == "" or content == "") { return null }; // Validate non-empty fields
-      if (price > 1_000_000) { return null }; // Prevent unreasonably high prices
+      if (title == "" or subject == "" or content == "") { return null };
+      if (price > 1_000_000) { return null };
       
       let noteId: Types.NoteId = _nextNoteId;
       _nextNoteId += 1;
@@ -39,16 +39,16 @@ module {
         subject;
         content;
         owner = caller;
+        creator = caller; // Both owner and creator set to caller when minting
         createdAt = Time.now();
         price;
       };
       notes.put(noteId, note);
       
-      // Award tokens based on word count (1 token per 10 words, rounded down)
       let wordCount = countWords(content);
       let tokenReward = wordCount / 10;
       if (tokenReward > 0) {
-        ignore await studyTokenManager.awardTokens(caller, tokenReward);
+        ignore await studyTokenManager.awardTokens(caller, Nat.toText(tokenReward));
       };
       ?noteId
     };
@@ -64,13 +64,9 @@ module {
         Array.map<(Types.NoteId, Types.NoteNFT), Types.NoteNFT>(
           Array.filter<(Types.NoteId, Types.NoteNFT)>(
             Iter.toArray(notes.entries()),
-            func((id: Types.NoteId, note: Types.NoteNFT)) : Bool {
-              note.owner == userId
-            }
+            func((id, note)) : Bool { note.owner == userId }
           ),
-          func((id: Types.NoteId, note: Types.NoteNFT)) : Types.NoteNFT {
-            note
-          }
+          func((id, note)) : Types.NoteNFT { note }
         )
       } catch (_) {
         []
@@ -83,7 +79,7 @@ module {
       let isRecipientRegistered = Option.isSome(await userManager.getUser(to));
       if (not isRecipientRegistered) { return false };
       switch (notes.get(noteId)) {
-        case null { return false };
+        case (null) { return false };
         case (?note) {
           if (note.owner != caller) { return false };
           let updatedNote: Types.NoteNFT = {
@@ -92,6 +88,7 @@ module {
             subject = note.subject;
             content = note.content;
             owner = to;
+            creator = note.owner; // Preserve original creator
             createdAt = note.createdAt;
             price = note.price;
           };
@@ -105,18 +102,19 @@ module {
       let isRegistered = Option.isSome(await userManager.getUser(caller));
       if (not isRegistered) { return false };
       switch (notes.get(noteId)) {
-        case null { return false };
+        case (null) { return false };
         case (?note) {
-          if (note.owner == caller) { return false }; // Cannot purchase own note
-          if (note.price == 0) { return false }; // Note not for sale
+          if (note.owner == caller) { return false };
+          if (note.price == 0) { return false };
           let success = await studyTokenManager.spendTokens(caller, note.price);
-          if (not success) { return false }; // Insufficient tokens or other error
+          if (not success) { return false };
           let updatedNote: Types.NoteNFT = {
             id = note.id;
             title = note.title;
             subject = note.subject;
             content = note.content;
             owner = caller;
+            creator = note.owner;
             createdAt = note.createdAt;
             price = 0; 
           };
