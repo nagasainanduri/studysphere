@@ -1,16 +1,5 @@
 {
   "canisters": {
-    "internet_identity": {
-      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-      "frontend": {},
-      "remote": {
-        "id": {
-          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
-    },
 
     "studysphere_backend": {
       "main": "src/studysphere_backend/main.mo",
@@ -21,7 +10,7 @@
     },
 
     "studysphere_frontend": {
-      "dependencies": [ "studysphere_backend" , "internet_identity" ],
+      "dependencies": [ "studysphere_backend" ],
       "source": [
         "src/studysphere_frontend/dist"
       ],
