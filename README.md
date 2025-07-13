@@ -2,7 +2,7 @@
 
 ## Table of Contents
 - [Overview](#overview)
-- [Backend Features](#backend-features)
+- [Smart Contracts & Features](#)
   - [User Management](#user-management)
   - [Group Management](#group-management)
   - [Note NFT Management](#note-nft-management)
