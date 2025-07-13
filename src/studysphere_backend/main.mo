@@ -256,6 +256,10 @@ actor StudySphere {
     await noteNFTManager.getUserNotes(userId)
   };
 
+  public func searchNotes(searchTerm: Text) : async [Types.NoteNFT] {
+    await noteNFTManager.searchNotes(searchTerm)
+  };
+
   // StudyTokens
   public shared(msg) func awardTokens(amount: Text): async Bool {
     let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
