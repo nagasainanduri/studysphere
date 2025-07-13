@@ -21,7 +21,7 @@
 ## Overview
 StudySphere enables users to register, create or join study groups, share notes as NFTs, and earn or spend StudyTokens for contributions and purchases. The backend is implemented as a single canister in Motoko, with modular components for user management, group management, note NFTs, and token handling. All data is stored persistently using `HashMap` structures, and the system ensures registered users can interact securely with groups and notes.
 
-## Backend Features
+## Smart Contract Features
 
 ### User Management
 Managed by `user.mo`, this module handles user registration and profile management.
