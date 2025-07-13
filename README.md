@@ -1,5 +1,3 @@
-# StudySphere Backend
-
 **StudySphere** is a decentralized application (dApp) built on the Internet Computer (IC) using Motoko, designed to facilitate collaborative learning through study groups, note-sharing as non-fungible tokens (NFTs), and a token-based reward system. This README details the backend features, architecture, and setup instructions for various systems, excluding the frontend.
 
 ## Table of Contents
