@@ -108,7 +108,11 @@ actor StudySphere {
 
   // User Management
   public shared(msg) func registerUser(username: Text): async Bool {
-    await userManager.registerUser(msg.caller, username)
+    let result = await userManager.registerUser(msg.caller, username);
+    switch (result) {
+      case (#ok(())) { true };
+      case (#err(_)) { false };
+    }
   };
 
   public shared(msg) func getUser(): async ?Types.User {
@@ -253,7 +257,7 @@ actor StudySphere {
   };
 
   // StudyTokens
-  public shared(msg) func awardTokens(amount: Nat): async Bool {
+  public shared(msg) func awardTokens(amount: Text): async Bool {
     let isRegistered = Option.isSome(await userManager.getUser(msg.caller));
     if (not isRegistered) { return false };
     await studyTokenManager.awardTokens(msg.caller, amount)
