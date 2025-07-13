@@ -44,7 +44,16 @@ module {
     subject: Text;
     content: Text;
     owner: Principal;
+    creator: Principal; 
     createdAt: Int;
     price: Nat; 
   };
+
+  public type Transaction = {
+    from: Principal;
+    to: Principal;
+    amount: Nat;
+    timestamp: Int;
+  };
+
 }
