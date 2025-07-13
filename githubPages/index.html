@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudySphere README</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100 text-gray-900">
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div id="readme-content" class="prose prose-gray max-w-none"></div>
+  </main>
+  <script>
+    // Fetch and render README.md
+    async function loadReadme() {
+      try {
+        const response = await fetch('README.md');
+        if (!response.ok) throw new Error('Failed to fetch README.md');
+        const markdown = await response.text();
+        const htmlContent = marked.parse(markdown);
+        document.getElementById('readme-content').innerHTML = htmlContent;
+      } catch (error) {
+        console.error('Error loading README:', error);
+        document.getElementById('readme-content').innerHTML = '<p class="text-red-600">Error: Could not load README.md</p>';
+      }
+    }
+
+    // Run on page load
+    window.onload = loadReadme;
+  </script>
+</body>
+</html>
