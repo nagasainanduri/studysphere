@@ -58,6 +58,7 @@ module {
       notes.get(noteId)
     };
 
+    //function to get all notes by user
     public func getUserNotes(userId: Types.UserId): async [Types.NoteNFT] {
       try {
         let _ = Principal.toText(userId);
@@ -73,6 +74,8 @@ module {
       }
     };
 
+
+    //function to transfer notes
     public func transferNoteNFT(caller: Principal, noteId: Types.NoteId, to: Principal): async Bool {
       let isRegistered = Option.isSome(await userManager.getUser(caller));
       if (not isRegistered) { return false };
@@ -98,6 +101,7 @@ module {
       }
     };
 
+    //function to purchase notes
     public func purchaseNoteNFT(caller: Principal, noteId: Types.NoteId): async Bool {
       let isRegistered = Option.isSome(await userManager.getUser(caller));
       if (not isRegistered) { return false };
@@ -122,6 +126,18 @@ module {
           true
         };
       }
+    };
+
+    //search notes by title or subject
+    public func searchNotes(searchTerm: Text) : async [Types.NoteNFT] {
+      let lowerSearch = Text.toLowercase(searchTerm);
+      return Array.filter<Types.NoteNFT>(
+        Iter.toArray(notes.vals()),
+        func(note: Types.NoteNFT): Bool {
+          Text.contains(Text.toLowercase(note.title), #text lowerSearch) or
+          Text.contains(Text.toLowercase(note.subject), #text lowerSearch)
+        }
+      );
     };
   }
 }
