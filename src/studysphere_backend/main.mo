@@ -115,8 +115,20 @@ actor StudySphere {
     }
   };
 
+  public shared(msg) func updateUser(username: Text): async Bool {
+    let result = await userManager.updateUser(msg.caller, username);
+    switch (result) {
+      case (#ok(())) { true };
+      case (#err(_)) { false };
+    }
+  };
+
   public shared(msg) func getUser(): async ?Types.User {
     await userManager.getUser(msg.caller)
+  };
+
+  public func getUserCount(): async Nat {
+    await userManager.getUserCount();
   };
 
   public shared func getUserByUsername(username: Text): async ?Types.User {
@@ -225,6 +237,8 @@ actor StudySphere {
       }
     )
   };
+
+
 
   // Note NFT Management
   public shared(msg) func mintNoteNFT(title: Text, subject: Text, content: Text, price: Nat): async ?Types.NoteId {
