@@ -51,7 +51,7 @@ module {
       switch (studyTokens.get(caller)) {
         case null { return false };
         case (?senderBalance) {
-          if (senderBalance < amount) { return false };
+          if (senderBalance < amount) { return false }; //check before tranferring
           let newSenderBalance = senderBalance - amount; 
           studyTokens.put(caller, newSenderBalance);
           switch (studyTokens.get(to)) {
