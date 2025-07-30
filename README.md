@@ -187,7 +187,7 @@ src/studysphere_backend/
    ```
 4. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/studysphere.git
+   git clone https://github.com/nagasainanduri/studysphere.git
    cd studysphere/src/studysphere_backend
    ```
 5. **Start the Local IC**:
