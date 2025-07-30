@@ -1,3 +1,4 @@
+// src/studysphere_frontend/vite.config.js
 import { fileURLToPath, URL } from 'url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -11,34 +12,34 @@ export default defineConfig({
     emptyOutDir: true,
   },
   optimizeDeps: {
+    disabled: true,
     esbuildOptions: {
       define: {
-        global: "globalThis",
+        global: 'globalThis',
       },
     },
   },
   server: {
+    port: 3000,
     proxy: {
-      "/api": {
-        target: "http://127.0.0.1:4943",
+      '/api': {
+        target: 'http://127.0.0.1:4943', 
         changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
   plugins: [
     react(),
-    environment("all", { prefix: "CANISTER_" }),
-    environment("all", { prefix: "DFX_" }),
+    environment('all', { prefix: 'CANISTER_' }),
+    environment('all', { prefix: 'DFX_' }),
   ],
   resolve: {
-    alias: [
-      {
-        find: "declarations",
-        replacement: fileURLToPath(
-          new URL("../declarations", import.meta.url)
-        ),
-      },
-    ],
+    alias: {
+      declarations: fileURLToPath(new URL('../declarations', import.meta.url)),
+      crypto: 'crypto-browserify',
+    },
     dedupe: ['@dfinity/agent'],
   },
 });
