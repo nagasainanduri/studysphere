@@ -51,8 +51,8 @@ module {
       switch (studyTokens.get(caller)) {
         case null { return false };
         case (?senderBalance) {
-          if (senderBalance < amount) { return false }; //check before tranferring
-          let newSenderBalance = senderBalance - amount; 
+          if (senderBalance < amount) { return false }; //check before transferring 
+          let newSenderBalance = senderBalance - amount; // may create warnings during deployment - needs logic update
           studyTokens.put(caller, newSenderBalance);
           switch (studyTokens.get(to)) {
             case null { studyTokens.put(to, amount); };
