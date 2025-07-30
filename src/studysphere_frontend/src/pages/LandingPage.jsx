@@ -6,7 +6,7 @@ import '../assets/App.css';
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
-  const [principal, setPrincipal] = useState(null);
+  const [_principal, setPrincipal] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
