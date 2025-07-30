@@ -43,7 +43,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white/40 to-gray-100/20 text-gray-900 p-6">
+    <div className="min-h-screen bg-gray-900 text-gray-200 p-6">
       {/* Welcome Section */}
       <motion.section
         className="mb-12 text-center"
@@ -51,85 +51,95 @@ const HomePage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="text-3xl font-bold text-blue-800 mb-2">
+        <h2 className="text-3xl font-bold text-gray-100 mb-2">
           Welcome, {user ? user.username : 'Learner'}!
         </h2>
-        <p className="text-lg text-gray-700">
+        <p className="text-lg text-gray-400">
           Connect, Learn, and Earn on the Internet Computer Blockchain
         </p>
       </motion.section>
 
       {/* Quick Actions */}
       <section className="mb-12">
-        <h3 className="text-xl font-semibold text-blue-800 mb-4">Quick Actions</h3>
+        <h3 className="text-xl font-semibold text-gray-200 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <motion.button
-            className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-4 text-center text-gray-900 hover:bg-white/20 transition-all duration-300"
+            className="bg-gray-800 border border-gray-600 rounded-xl p-4 text-center text-gray-200 hover:bg-gray-700 transition-all duration-300"
             onClick={() => navigate('/groups')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <h4 className="font-semibold">Study Groups</h4>
-            <p className="text-sm text-gray-700">Create or join groups to collaborate.</p>
+            <p className="text-sm text-gray-400">Create or join groups to collaborate.</p>
           </motion.button>
           <motion.button
-            className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-4 text-center text-gray-900 hover:bg-white/20 transition-all duration-300"
+            className="bg-gray-800 border border-gray-600 rounded-xl p-4 text-center text-gray-200 hover:bg-gray-700 transition-all duration-300"
             onClick={() => navigate('/search')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <h4 className="font-semibold">Browse Notes</h4>
-            <p className="text-sm text-gray-700">Explore NFT study notes.</p>
+            <p className="text-sm text-gray-400">Explore NFT study notes.</p>
           </motion.button>
           <motion.button
-            className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-4 text-center text-gray-900 hover:bg-white/20 transition-all duration-300"
+            className="bg-gray-800 border border-gray-600 rounded-xl p-4 text-center text-gray-200 hover:bg-gray-700 transition-all duration-300"
             onClick={() => navigate('/profile')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <h4 className="font-semibold">Your Profile</h4>
-            <p className="text-sm text-gray-700">View tokens and notes.</p>
+            <p className="text-sm text-gray-400">View tokens and notes.</p>
           </motion.button>
         </div>
       </section>
 
       {/* User Dashboard */}
       <section className="mb-12">
-        <h3 className="text-xl font-semibold text-blue-800 mb-4">Your Dashboard</h3>
+        <h3 className="text-xl font-semibold text-gray-200 mb-4">Your Dashboard</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Token Balance */}
-          <div className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-6">
-            <h4 className="font-semibold text-gray-900">StudyTokens</h4>
-            <p className="text-2xl text-blue-600">{isLoading ? 'Loading...' : `${tokenBalance} Tokens`}</p>
+          <div className="bg-gray-800 border border-gray-600 rounded-xl p-6">
+            <h4 className="font-semibold text-gray-200">StudyTokens</h4>
+            <p className="text-2xl text-gray-300">{isLoading ? 'Loading...' : `${tokenBalance} Tokens`}</p>
           </div>
           {/* Recent Groups */}
-          <div className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-6">
-            <h4 className="font-semibold text-gray-900">Recent Groups</h4>
+          <div className="bg-gray-800 border border-gray-600 rounded-xl p-6">
+            <h4 className="font-semibold text-gray-200">Recent Groups</h4>
             {isLoading ? (
-              <p className="text-gray-700">Loading...</p>
+              <p className="text-gray-400">Loading...</p>
             ) : userGroups.length > 0 ? (
-              <ul className="list-disc list-inside text-gray-700">
+              <ul className="list-disc list-inside text-gray-400">
                 {userGroups.map((group) => (
                   <li key={group.id} className="truncate">{group.name}</li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-700">No groups yet. <a href="/groups" className="text-blue-600 hover:underline">Join one!</a></p>
+              <p className="text-gray-400">
+                No groups yet.{' '}
+                <a href="/groups" className="text-gray-300 hover:underline">
+                  Join one!
+                </a>
+              </p>
             )}
           </div>
           {/* Recent Notes */}
-          <div className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-6">
-            <h4 className="font-semibold text-gray-900">Recent Notes</h4>
+          <div className="bg-gray-800 border border-gray-600 rounded-xl p-6">
+            <h4 className="font-semibold text-gray-200">Recent Notes</h4>
             {isLoading ? (
-              <p className="text-gray-700">Loading...</p>
+              <p className="text-gray-400">Loading...</p>
             ) : userNotes.length > 0 ? (
-              <ul className="list-disc list-inside text-gray-700">
+              <ul className="list-disc list-inside text-gray-400">
                 {userNotes.map((note) => (
                   <li key={note.id} className="truncate">{note.title}</li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-700">No notes yet. <a href="/search" className="text-blue-600 hover:underline">Create one!</a></p>
+              <p className="text-gray-400">
+                No notes yet.{' '}
+                <a href="/search" className="text-gray-300 hover:underline">
+                  Create one!
+                </a>
+              </p>
             )}
           </div>
         </div>
@@ -137,20 +147,20 @@ const HomePage = () => {
 
       {/* Featured Content */}
       <section className="mb-12">
-        <h3 className="text-xl font-semibold text-blue-800 mb-4">Explore StudySphere</h3>
-        <div className="bg-white/10 border border-white/30 backdrop-blur-xl rounded-xl p-6">
-          <p className="text-gray-700 mb-2">
+        <h3 className="text-xl font-semibold text-gray-200 mb-4">Explore StudySphere</h3>
+        <div className="bg-gray-800 border border-gray-600 rounded-xl p-6">
+          <p className="text-gray-400 mb-2">
             Discover popular study groups and trending NFT notes to boost your learning.
           </p>
           <div className="flex space-x-4">
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
+              className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-all duration-300"
               onClick={() => navigate('/groups')}
             >
               Popular Groups
             </button>
             <button
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300"
+              className="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-all duration-300"
               onClick={() => navigate('/search')}
             >
               Trending Notes
@@ -161,8 +171,11 @@ const HomePage = () => {
 
       {/* ICP Branding */}
       <section className="text-center">
-        <p className="text-sm text-gray-600">
-          Powered by <a href="https://internetcomputer.org" className="text-blue-600 hover:underline">Internet Computer (ICP)</a>
+        <p className="text-sm text-gray-500">
+          Powered by{' '}
+          <a href="https://internetcomputer.org" className="text-gray-300 hover:underline">
+            Internet Computer (ICP)
+          </a>
         </p>
       </section>
     </div>
