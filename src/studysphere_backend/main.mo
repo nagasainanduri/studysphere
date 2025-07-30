@@ -13,31 +13,31 @@ import NoteNFT "note/noteNFT";
 import StudyToken "token/studyToken";
 import Types "types/types";
 
-actor StudySphere {
+persistent actor StudySphere {
   // Stable arrays for persistence
-  private stable var groupEntries: [(Types.GroupId, Types.Group)] = [];
-  private stable var messageEntries: [(Nat, Types.Message)] = [];
-  private stable var noteEntries: [(Types.NoteId, Types.NoteNFT)] = [];
-  private stable var nextGroupId: Nat = 0;
-  private stable var nextMessageId: Nat = 0;
-  private stable var nextNoteId: Nat = 0;
+  private var groupEntries: [(Types.GroupId, Types.Group)] = [];
+  private var messageEntries: [(Nat, Types.Message)] = [];
+  private var noteEntries: [(Types.NoteId, Types.NoteNFT)] = [];
+  private var nextGroupId: Nat = 0;
+  private var nextMessageId: Nat = 0;
+  private var nextNoteId: Nat = 0;
 
   // Runtime HashMaps
-  private var groups = HashMap.HashMap<Types.GroupId, Types.Group>(
+  private transient var groups = HashMap.HashMap<Types.GroupId, Types.Group>(
     10,
     Nat.equal,
     func(gid: Types.GroupId) : Hash.Hash {
       Nat32.fromNat(gid)
     }
   );
-  private var messages = HashMap.HashMap<Nat, Types.Message>(
+  private transient var messages = HashMap.HashMap<Nat, Types.Message>(
     10,
     Nat.equal,
     func(mid: Nat) : Hash.Hash {
       Nat32.fromNat(mid)
     }
   );
-  private var notes = HashMap.HashMap<Types.NoteId, Types.NoteNFT>(
+  private transient var notes = HashMap.HashMap<Types.NoteId, Types.NoteNFT>(
     10,
     Nat.equal,
     func(noteId: Types.NoteId) : Hash.Hash {
@@ -46,10 +46,10 @@ actor StudySphere {
   );
   
   // Initialize managers
-  private let userManager = User.UserManager();
-  private let groupManager = Group.GroupManager(nextGroupId, groups);
-  private let noteNFTManager = NoteNFT.NoteNFTManager(nextNoteId, notes);
-  private let studyTokenManager = StudyToken.StudyTokenManager();
+  private transient let userManager = User.UserManager();
+  private transient let groupManager = Group.GroupManager(nextGroupId, groups);
+  private transient let noteNFTManager = NoteNFT.NoteNFTManager(nextNoteId, notes);
+  private transient let studyTokenManager = StudyToken.StudyTokenManager();
 
   // System methods for persistence
   system func preupgrade() {
@@ -237,8 +237,6 @@ actor StudySphere {
       }
     )
   };
-
-
 
   // Note NFT Management
   public shared(msg) func mintNoteNFT(title: Text, subject: Text, content: Text, price: Nat): async ?Types.NoteId {
