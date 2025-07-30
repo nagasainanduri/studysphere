@@ -5,7 +5,7 @@
       "main": "src/studysphere_backend/main.mo",
       "type": "motoko",
       "declarations": {
-        "output": "src/studysphere_frontend/src/declarations/studysphere_backend"
+        "output": "src/declarations/studysphere_backend"
       }
     },
 
@@ -15,6 +15,9 @@
         "src/studysphere_frontend/dist"
       ],
       "type": "assets",
+      "declarations" : {
+        "output" : "src/declarations/studysphere_frontend"
+      },
       "workspace": "studysphere_frontend"
     }
   },
